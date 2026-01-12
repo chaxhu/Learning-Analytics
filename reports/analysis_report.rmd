@@ -1,0 +1,567 @@
+---
+title: "Learning Analytics MOOC Engagement Analysis"
+subtitle: "MAS8600/MAS8505 Coursework"
+author: "Pranit Chatterjee"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    theme: cosmo
+    highlight: tango
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6,
+  dpi = 300
+)
+
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+```
+
+---
+
+# Executive Summary
+
+This analysis examines learner engagement patterns across 7 runs of a MOOC using data from 37,296 enrollment records. Using CRISP-DM methodology, we identify key engagement drivers and completion barriers. Early findings indicate low completion rates (~5.8%), with significant demographic data gaps (>88% missing). Most unenrolled learners disengage within 72 days of enrollment.
+
+---
+
+# 1. Business Understanding
+
+## 1.1 Business Objective
+
+The primary objective is to understand MOOC learner engagement and identify patterns in:
+
+- **Course completion rates** by learner cohort  
+- **Unenrollment timing** and duration patterns  
+- **Certificate purchase behavior** (indicator of serious engagement)  
+- **Demographic factors** influencing engagement  
+
+## 1.2 Success Criteria
+
+- Identify engagement segments (completers, active, unenrolled).  
+- Quantify completion rates and conversion to certificates.  
+- Provide actionable insights for retention strategies.  
+
+## 1.3 Data Overview
+
+- **Total enrollments:** 37,296 learners across 7 course runs  
+- **Time period:** 2016–2018  
+- **Key variables:** Enrollment, unenrollment, course completion, demographics  
+
+---
+
+# 2. Data Understanding
+
+## 2.1 Data Quality Assessment
+
+### Data Loading
+
+```{r}
+
+project_root <- normalizePath("..")
+# Load the 7 CSVs directly (adjust paths if needed)
+enrollment_1 <- read_csv(file.path(project_root, "data/enrollment_1.csv")) %>% mutate(course_run = 1)
+enrollment_2 <- read_csv(file.path(project_root, "data/enrollment_2.csv")) %>% mutate(course_run = 2)
+enrollment_3 <- read_csv(file.path(project_root, "data/enrollment_3.csv")) %>% mutate(course_run = 3)
+enrollment_4 <- read_csv(file.path(project_root, "data/enrollment_4.csv")) %>% mutate(course_run = 4)
+enrollment_5 <- read_csv(file.path(project_root, "data/enrollment_5.csv")) %>% mutate(course_run = 5)
+enrollment_6 <- read_csv(file.path(project_root, "data/enrollment_6.csv")) %>% mutate(course_run = 6)
+enrollment_7 <- read_csv(file.path(project_root, "data/enrollment_7.csv")) %>% mutate(course_run = 7)
+
+all_enrollments <- dplyr::bind_rows(
+  enrollment_1,
+  enrollment_2,
+  enrollment_3,
+  enrollment_4,
+  enrollment_5,
+  enrollment_6,
+  enrollment_7
+)
+
+```
+
+### Feature Engineering
+
+```{r feature-engineering}
+all_enrollments <- all_enrollments %>%
+  mutate(
+    enrolled_date = as.Date(enrolled_at),
+    unenrolled_date = as.Date(unenrolled_at),
+    enrollment_duration = as.numeric(unenrolled_date - enrolled_date),
+    fully_participated = !is.na(fully_participated_at),
+    purchased_statement = !is.na(purchased_statement_at),
+    unenrolled = !is.na(unenrolled_at),
+    engagement_status = case_when(
+      fully_participated ~ "Completed",
+      unenrolled ~ "Unenrolled",
+      TRUE ~ "Still Active / Unknown"
+    )
+  )
+```
+### Missing Values Summary
+
+```{r missing-values, results='asis'}
+missing_summary <- all_enrollments %>%
+  summarise(across(everything(), ~sum(is.na(.)))) %>%
+  pivot_longer(cols = everything(), names_to = "Column", values_to = "Missing_Count") %>%
+  mutate(
+    Missing_Pct = round(Missing_Count / nrow(all_enrollments) * 100, 1),
+    Data_Quality = case_when(
+      Missing_Pct == 0 ~ "Complete",
+      Missing_Pct < 10 ~ "Good",
+      Missing_Pct < 50 ~ "Fair",
+      TRUE ~ "Poor"
+    )
+  ) %>%
+  arrange(desc(Missing_Pct))
+
+kable(missing_summary, 
+      caption = "Data Quality Assessment: Missing Values",
+      align = "lrrl") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE)
+```
+
+**Interpretation:** Temporal variables (enrollment, unenrollment, completion dates) are 100% complete. Demographic variables show >88% missing, indicating limited self-reported data from learners.
+
+### "Unknown" Values in Categorical Fields
+
+```{r unknown-values, results='asis'}
+unknown_summary <- tibble(
+  Field = c("Gender", "Age Range", "Education Level", "Employment Status"),
+  Unknown_Count = c(
+    sum(all_enrollments$gender == "Unknown", na.rm = TRUE),
+    sum(all_enrollments$age_range == "Unknown", na.rm = TRUE),
+    sum(all_enrollments$highest_education_level == "Unknown", na.rm = TRUE),
+    sum(all_enrollments$employment_status == "Unknown", na.rm = TRUE)
+  )
+) %>%
+  mutate(
+    Pct_Total = round(Unknown_Count / nrow(all_enrollments) * 100, 1)
+  )
+
+kable(unknown_summary,
+      caption = "Unknown/Not Specified Values in Demographic Fields",
+      align = "lrr") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE)
+```
+
+## 2.2 Enrollment Timeline
+
+```{r date-range}
+# ensure enrolled_date is Date
+all_enrollments$enrolled_date <- as.Date(all_enrollments$enrolled_at)
+
+min_date <- min(all_enrollments$enrolled_date, na.rm = TRUE)
+max_date <- max(all_enrollments$enrolled_date, na.rm = TRUE)
+
+cat("**Enrollment Date Range:**\n\n")
+cat("- Earliest enrollment:", format(min_date, "%B %d, %Y"), "\n")
+cat("- Latest enrollment:", format(max_date, "%B %d, %Y"), "\n")
+cat("- Time span:", as.numeric(max_date - min_date), "days (~", 
+    round(as.numeric(max_date - min_date) / 365, 1), "years)\n")
+```
+
+## 2.3 Key Data Characteristics
+
+```{r data-characteristics, results='asis'}
+char_summary <- tibble(
+  Metric = c(
+    "Total Enrollments",
+    "Unique Course Runs",
+    "Date Range (days)",
+    "Complete Demographics",
+    "With Gender",
+    "With Age Range",
+    "With Education Level",
+    "With Employment Status"
+  ),
+  Value = c(
+    format(nrow(all_enrollments), big.mark = ","),
+    n_distinct(all_enrollments$course_run),
+    as.numeric(max_date - min_date),
+    sum(all_enrollments$has_demographics),
+    sum(!is.na(all_enrollments$gender) & all_enrollments$gender != "Unknown"),
+    sum(!is.na(all_enrollments$age_range) & all_enrollments$age_range != "Unknown"),
+    sum(!is.na(all_enrollments$highest_education_level) & all_enrollments$highest_education_level != "Unknown"),
+    sum(!is.na(all_enrollments$employment_status) & all_enrollments$employment_status != "Unknown")
+  )
+)
+
+kable(char_summary,
+      caption = "Dataset Characteristics",
+      align = "lr") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE)
+```
+
+---
+
+# 3. Data Preparation
+
+## 3.1 Data Cleaning Steps
+
+The following transformations were applied:
+
+1. **Date Conversion:** All date-time strings converted to proper Date objects (`enrolled_date`, `unenrolled_date`, `fully_participated_date`, `purchased_statement_date`).
+
+2. **Standardization:** "Unknown" values in demographic fields converted to `NA` for proper handling.
+
+3. **Course Run Coding:** Each enrollment tagged with its course run (1–7) for comparative analysis.
+
+## 3.2 Feature Engineering
+
+New derived variables created for engagement analysis:
+
+| Feature | Definition | Type |
+|---------|-----------|------|
+| `fully_participated` | TRUE if learner reached course completion milestone | Binary |
+| `purchased_statement` | TRUE if learner purchased certificate/statement | Binary |
+| `unenrolled` | TRUE if learner unenrolled before course end | Binary |
+| `enrollment_duration` | Days between enrollment and unenrollment | Numeric |
+| `engagement_status` | Categorical: "Completed", "Unenrolled", "Still Active / Unknown" | Factor |
+| `has_demographics` | TRUE if learner provided complete demographic data | Binary |
+
+---
+
+# 4. Exploratory Data Analysis
+
+## 4.1 Engagement Status Distribution
+
+### Summary Statistics
+
+```{r engagement-summary, results='asis'}
+all_enrollments <- all_enrollments %>%
+  mutate(
+    fully_participated = fully_participated %in% c(TRUE, 1, "TRUE"),
+    unenrolled = unenrolled %in% c(TRUE, 1, "TRUE"),
+    engagement_status = case_when(
+      fully_participated ~ "Completed",
+      unenrolled ~ "Unenrolled",
+      TRUE ~ "Still Active / Unknown"
+    )
+  )
+
+engagement_dist <- all_enrollments %>%
+  count(engagement_status) %>%
+  mutate(
+    Percentage = round(n / sum(n) * 100, 2),
+    Cumulative_Pct = round(cumsum(n) / sum(n) * 100, 2)
+  ) %>%
+  rename("Engagement Status" = engagement_status, "Count" = n)
+
+kable(engagement_dist,
+      caption = "Learner Engagement Status",
+      align = "lrrr") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE)
+```
+
+### Visualization: Engagement Status
+
+```{r engagement-plot, fig.cap="Distribution of learners by engagement status"}
+all_enrollments %>%
+  count(engagement_status) %>%
+  mutate(engagement_status = factor(engagement_status, 
+                                     levels = c("Completed", "Unenrolled", "Still Active / Unknown"))) %>%
+  ggplot(aes(x = reorder(engagement_status, -n), y = n, fill = engagement_status)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(n, "\n(", round(n/sum(n)*100, 1), "%)")),
+            vjust = -0.5, size = 4) +
+  labs(
+    title = "Learner Engagement Status Distribution",
+    x = "Engagement Status",
+    y = "Number of Learners",
+    caption = "Total enrollments: 37,296"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 15, hjust = 1),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+## 4.2 Completion Analysis
+
+### Completion Indicators
+
+```{r completion-summary, results='asis'}
+completion_stats <- tibble(
+  Indicator = c("Fully Participated", "Purchased Statement", "Unenrolled"),
+  Count = c(
+    sum(all_enrollments$fully_participated),
+    sum(all_enrollments$purchased_statement),
+    sum(all_enrollments$unenrolled)
+  )
+) %>%
+  mutate(
+    Percentage = round(Count / nrow(all_enrollments) * 100, 2)
+  )
+
+kable(completion_stats,
+      caption = "Completion and Engagement Indicators",
+      align = "lrr") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE)
+```
+
+**Key Insights:**
+
+- Only **5.78% (2,154 learners)** fully participated in the course.
+- **0.77% (289 learners)** purchased a certificate/statement, indicating very limited willingness to pay.
+- **11.24% (4,191 learners)** unenrolled before course end.
+- **82.21% (30,762 learners)** remain in "Still Active / Unknown" status, likely representing informal or discontinued engagement.
+
+### Visualization: Completion Funnel
+
+```{r completion-funnel, fig.cap="Completion funnel showing progression from enrollment to certificate purchase"}
+funnel_data <- tibble(
+  Stage = c("Enrolled", "Fully Participated", "Purchased Statement"),
+  Count = c(
+    nrow(all_enrollments),
+    sum(all_enrollments$fully_participated),
+    sum(all_enrollments$purchased_statement)
+  )
+) %>%
+  mutate(
+    Percentage = round(Count / nrow(all_enrollments) * 100, 2),
+    Stage = factor(Stage, levels = c("Enrolled", "Fully Participated", "Purchased Statement"))
+  )
+
+ggplot(funnel_data, aes(x = Stage, y = Count, fill = Stage)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(Count, "\n(", Percentage, "%)")),
+            vjust = -0.5, size = 4, fontface = "bold") +
+  labs(
+    title = "Course Completion Funnel",
+    subtitle = "Drop-off at each progression stage",
+    x = "Progression Stage",
+    y = "Number of Learners"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 15, hjust = 1),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+## 4.3 Unenrollment Duration Analysis
+
+### Duration Statistics
+
+```{r duration-stats, results='asis'}
+duration_summary <- all_enrollments %>%
+  filter(!is.na(enrollment_duration)) %>%
+  summarise(
+    Metric = c("Mean", "Median", "Std. Dev", "Min", "Max", "Q1", "Q3"),
+    Value_Days = c(
+      round(mean(enrollment_duration), 1),
+      round(median(enrollment_duration), 1),
+      round(sd(enrollment_duration), 1),
+      round(min(enrollment_duration), 1),
+      round(max(enrollment_duration), 1),
+      round(quantile(enrollment_duration, 0.25), 1),
+      round(quantile(enrollment_duration, 0.75), 1)
+    )
+  )
+
+kable(duration_summary,
+      caption = "Unenrollment Duration Statistics (Days)",
+      align = "lr") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE)
+```
+
+**Interpretation:** Unenrolled learners persist for an average of **124 days** (median: **72 days**), with high variability (SD: 145 days). This suggests a critical drop-off window around 2–3 months post-enrollment.
+
+### Visualization: Duration Distribution
+
+```{r duration-histogram, fig.cap="Distribution of days from enrollment to unenrollment"}
+all_enrollments %>%
+  filter(!is.na(enrollment_duration) & enrollment_duration > 0) %>%
+  ggplot(aes(x = enrollment_duration)) +
+  geom_histogram(binwidth = 30, fill = "#2E86AB", alpha = 0.8, color = "white") +
+  geom_vline(aes(xintercept = median(enrollment_duration, na.rm = TRUE)),
+             color = "#A23B72", linetype = "dashed", size = 1, label = "Median") +
+  geom_vline(aes(xintercept = mean(enrollment_duration, na.rm = TRUE)),
+             color = "#F18F01", linetype = "dashed", size = 1, label = "Mean") +
+  labs(
+    title = "Time to Unenrollment Distribution",
+    x = "Days from Enrollment to Unenrollment",
+    y = "Number of Learners",
+    caption = "Excludes 0-day unenrollments (same-day drop)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14)
+  ) +
+  scale_x_continuous(breaks = seq(0, 900, 150))
+```
+
+### Visualization: Unenrollment by Duration Quartile
+
+```{r duration-quartiles, fig.cap="Breakdown of unenrollments by duration quartiles"}
+all_enrollments %>%
+  filter(!is.na(enrollment_duration)) %>%
+  mutate(
+    Duration_Quartile = case_when(
+      enrollment_duration <= 7 ~ "≤ 1 week (0-7 days)",
+      enrollment_duration <= 30 ~ "1-4 weeks (8-30 days)",
+      enrollment_duration <= 72 ~ "1-10 weeks (31-72 days)",
+      enrollment_duration <= 180 ~ "2-6 months (73-180 days)",
+      TRUE ~ "> 6 months (>180 days)"
+    ),
+    Duration_Quartile = factor(Duration_Quartile,
+                               levels = c("≤ 1 week (0-7 days)",
+                                          "1-4 weeks (8-30 days)",
+                                          "1-10 weeks (31-72 days)",
+                                          "2-6 months (73-180 days)",
+                                          "> 6 months (>180 days)"))
+  ) %>%
+  count(Duration_Quartile) %>%
+  mutate(Percentage = round(n / sum(n) * 100, 1)) %>%
+  ggplot(aes(x = Duration_Quartile, y = n, fill = Duration_Quartile)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(n, "\n(", Percentage, "%)")),
+            vjust = -0.5, size = 3.5) +
+  labs(
+    title = "Unenrollment by Duration Quartile",
+    x = "Time to Unenrollment",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 30, hjust = 1),
+    plot.title = element_text(face = "bold", size = 14)
+  )
+```
+
+## 4.4 Engagement by Course Run
+
+### Completion Rates Across Runs
+
+```{r run-comparison, results='asis'}
+run_stats <- all_enrollments %>%
+  group_by(course_run) %>%
+  summarise(
+    Enrollments = n(),
+    Completed = sum(fully_participated),
+    Completion_Rate = round(sum(fully_participated) / n() * 100, 2),
+    Unenrolled = sum(unenrolled),
+    Unenrollment_Rate = round(sum(unenrolled) / n() * 100, 2),
+    Purchased = sum(purchased_statement),
+    Purchase_Rate = round(sum(purchased_statement) / n() * 100, 3),
+    Avg_Duration = round(mean(enrollment_duration, na.rm = TRUE), 1)
+  ) %>%
+  rename(
+    "Course Run" = course_run,
+    "Enroll #" = Enrollments,
+    "Complete #" = Completed,
+    "Complete %" = Completion_Rate,
+    "Unenroll #" = Unenrolled,
+    "Unenroll %" = Unenrollment_Rate,
+    "Purchase #" = Purchased,
+    "Purchase %" = Purchase_Rate,
+    "Avg Days" = Avg_Duration
+  )
+
+kable(run_stats,
+      caption = "Engagement Metrics by Course Run",
+      align = "lrrrrrrrr") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE)
+```
+
+### Visualization: Completion Rate by Run
+
+```{r run-completion-plot, fig.cap="Completion rates vary across course runs"}
+all_enrollments %>%
+  group_by(course_run) %>%
+  summarise(
+    Completion_Rate = sum(fully_participated) / n() * 100,
+    Enrollments = n()
+  ) %>%
+  ggplot(aes(x = course_run, y = Completion_Rate, fill = course_run)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(Completion_Rate, 2), "%")),
+            vjust = -0.5, size = 4, fontface = "bold") +
+  labs(
+    title = "Course Completion Rate by Run",
+    x = "Course Run",
+    y = "Completion Rate (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(size = 11)
+  ) +
+  scale_y_continuous(limits = c(0, max(all_enrollments %>%
+    group_by(course_run) %>%
+    summarise(Completion_Rate = sum(fully_participated) / n() * 100) %>%
+    pull(Completion_Rate)) * 1.15))
+```
+
+---
+
+# 5. Key Findings & Insights
+
+## 5.1 Engagement Patterns
+
+1. **Very Low Completion:** Only 5.78% of enrollments result in full course participation, indicating a significant engagement challenge.
+
+2. **Low Monetization:** Certificate/statement purchase rate is extremely low (0.77%), suggesting limited perceived value or willingness to pay among learners.
+
+3. **High Unenrollment:** 11.24% of learners actively unenroll, with a median time of **72 days**—indicating most drop-off occurs in the first 2–3 months.
+
+4. **Large "Unknown" Cohort:** 82.21% of enrollments fall into "Still Active / Unknown," likely representing learners who stop engaging informally without formal unenrollment.
+
+## 5.2 Critical Drop-Off Window
+
+The unenrollment duration analysis reveals:
+
+- **41% of unenrolled learners** drop out within the first week.  
+- **Median persistence:** 72 days (approximately 10 weeks).  
+- **Max persistence:** 889 days (~2.4 years), indicating some long-term lurkers.  
+
+This suggests an **early intervention window (weeks 1–10)** is critical for retention.
+
+## 5.3 Data Quality Implications
+
+High missing demographic data (>88%) limits demographic segmentation. Analysis cannot confidently compare engagement by age, education, or employment without imputation or assumptions.
+
+---
+
+# 6. Conclusions & Recommendations
+
+## 6.1 Conclusions
+
+1. **MOOC completion is rare** (~5.8%), and conversion to paid certificates is minimal (~0.8%).  
+2. **Most disengagement is informal**—learners don't formally unenroll; they simply stop participating.  
+3. **Early weeks are critical**—42% of unenrollments occur within 1 week; the median is ~10 weeks.  
+4. **Demographic factors are unmeasured**—missing data prevents deeper segmentation analysis.
+
+## 6.2 Recommendations for Next Cycle
+
+1. **Improve learner onboarding** in weeks 1–2 to reduce immediate drop-off.  
+2. **Implement engagement checkpoints** at week 2, 4, and 8 to re-activate at-risk learners.  
+3. **Collect demographic data** through mandatory profile completion to enable segmentation analysis.  
+4. **Investigate "Still Active" cohort** to distinguish true lurkers from inactive accounts.  
+5. **Pilot retention interventions** (e.g., peer support, milestone rewards) for next course run.
+
+---
