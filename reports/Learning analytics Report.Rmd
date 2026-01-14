@@ -1,7 +1,15 @@
 ---
-title: Learning Analytics MOOC Engagement Analysis
-author: Pranit Chatterjee
-output: html_document
+title: "Learning Analytics Report"
+author: "Pranit Chatterjee"
+date: "2026-01-14"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    theme: cosmo
+    highlight: tango
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -25,13 +33,11 @@ library(multcomp)
 library(car)
 ```
 
----
 
 # Executive Summary
 
 This analysis examines learner engagement patterns across 7 runs of a MOOC using data from 37,296 enrollment records. Using CRISP-DM methodology, we identify key engagement drivers and completion barriers. Early findings indicate low completion rates (~5.8%), with significant demographic data gaps (>88% missing). Most unenrolled learners disengage within 72 days of enrollment.
 
----
 
 # 1. Business Understanding
 
@@ -55,7 +61,6 @@ The primary objective is to understand MOOC learner engagement and identify patt
 - **Total enrollments:** 37,296 learners across 7 course runs  
 - **Time period:** 2016–2018  
 - **Key variables:** Enrollment, unenrollment, course completion, demographics  
-
 
 # 2. Data Understanding (Cycle - 1)
 
@@ -211,7 +216,6 @@ kable(char_summary,
                 full_width = FALSE)
 ```
 
----
 
 # 3. Data Preparation
 
@@ -238,7 +242,6 @@ New derived variables created for engagement analysis:
 | `engagement_status` | Categorical: "Completed", "Unenrolled", "Still Active / Unknown" | Factor |
 | `has_demographics` | TRUE if learner provided complete demographic data | Binary |
 
----
 
 # 4. Exploratory Data Analysis
 
@@ -517,7 +520,6 @@ all_enrollments %>%
     pull(Completion_Rate)) * 1.15))
 ```
 
----
 
 # 5. Key Findings & Insights
 
@@ -545,7 +547,6 @@ This suggests an **early intervention window (weeks 1–10)** is critical for re
 
 High missing demographic data (>88%) limits demographic segmentation. Analysis cannot confidently compare engagement by age, education, or employment without imputation or assumptions.
 
----
 
 # 6. Conclusions & Recommendations
 
@@ -556,14 +557,13 @@ High missing demographic data (>88%) limits demographic segmentation. Analysis c
 3. **Early weeks are critical**—42% of unenrollments occur within 1 week; the median is ~10 weeks.  
 4. **Demographic factors are unmeasured**—missing data prevents deeper segmentation analysis.
 
----
+
 This ***Cycle 2*** analysis tests key hypotheses about MOOC learner engagement using statistical methods. Building on Cycle 1's exploratory findings, we employ **one-way ANOVA** to examine whether mean time-to-unenroll (enrollment duration) differs significantly across course runs (H2), chi-squared tests for categorical relationships, and post-hoc tests to identify which groups differ. Key finding: **Mean enrollment duration varies significantly by course run** (p < 0.05), with implications for course-specific retention strategies.
 
----
 
-# 1. Cycle 2: Hypothesis Testing Framework
+# 7. Cycle 2: Hypothesis Testing Framework
 
-## 1.1 Research Questions & Hypotheses
+## 7.1 Research Questions & Hypotheses
 
 From Cycle 1, we observed:
 - Variable completion rates across 7 course runs (range: 4.8%–7.2%)
@@ -580,15 +580,14 @@ From Cycle 1, we observed:
 
 **Focus for this report: H1** (mean enrollment duration by course run), with supporting tests for H2 and H3.
 
-## 1.2 CRISP-DM Phase: Evaluation
+## 7.2 CRISP-DM Phase: Evaluation
 
 This cycle addresses **Evaluation** (phase 5 in CRISP-DM):
 - Test statistical significance of patterns observed in Cycle 1.
 - Determine whether differences are real or due to random variation.
 - Prepare conclusions and recommendations for action.
 
----
-# 2. Data Preparation & Feature Engineering
+# 8. Data Preparation & Feature Engineering
 
 ```{r data-prepare}
 # Load raw CSVs
@@ -653,11 +652,10 @@ cat("Total enrollments:", nrow(all_enrollments), "\n")
 cat("Course runs:", n_distinct(all_enrollments$course_run), "\n")
 ```
 
----
 
-# 3. Hypothesis H2: Mean Duration Differs by Course Run
+# 9. Hypothesis H2: Mean Duration Differs by Course Run
 
-## 3.1 Hypothesis Statement
+## 9.1 Hypothesis Statement
 
 **H1 :**
 - **Null Hypothesis (H0):** Mean enrollment duration is equal across all 7 course runs.  
@@ -666,10 +664,10 @@ cat("Course runs:", n_distinct(all_enrollments$course_run), "\n")
 - **Alternative Hypothesis (H1):** At least one course run has a different mean enrollment duration.  
   \(\text{At least one } μ_i \neq μ_j\)
 
-- **Significance level (α):** 0.05  
+- **Significance level :** 0.05  
 - **Test:** One-way ANOVA
 
-## 3.2 Descriptive Statistics by Course Run
+## 9.2 Descriptive Statistics by Course Run
 
 ```{r h1-descriptive}
 # Calculate duration statistics by course run
@@ -698,7 +696,7 @@ kable(duration_by_run,
 
 **Observation:** Mean enrollment duration ranges from **36 to 180 days** across runs. Run 1 has the highest mean (180.37 days), while Run 7 has the lowest (36.38 days). Visually, differences exist, but are they statistically significant?
 
-## 3.3 Boxplot Visualization
+## 9.3 Boxplot Visualization
 
 ```{r h1-boxplot, fig.cap="Distribution of enrollment duration by course run"}
 all_enrollments %>%
@@ -719,7 +717,7 @@ all_enrollments %>%
   )
 ```
 
-## 3.4 One-Way ANOVA Test
+## 9.4 One-Way ANOVA Test
 
 ```{r h1-anova}
 # Prepare data for ANOVA (remove NA and extreme outliers)
@@ -777,27 +775,26 @@ kable(anova_table,
 cat("**Statistical Decision:**\n\n")
 cat("- **F-statistic:** ", round(f_statistic, 4), "\n")
 cat("- **p-value:** ", format(p_value, scientific = TRUE, digits = 4), "\n")
-cat("- **Significance level (α):** 0.05\n\n")
+cat("- **Significance level :** 0.05\n\n")
 
 if (p_value < 0.05) {
   cat("**Conclusion: REJECT the null hypothesis (H0).**\n\n")
-  cat("Since p-value (", format(p_value, scientific = TRUE, digits = 3), ") < α (0.05),\n")
+  cat("Since p-value (", format(p_value, scientific = TRUE, digits = 3), ") <  (0.05),\n")
   cat("we have **statistically significant evidence** that mean enrollment duration\n")
   cat("**differs across course runs**.\n\n")
   cat("At least one course run has a significantly different mean duration than the others.\n")
 } else {
   cat("**Conclusion: FAIL TO REJECT the null hypothesis (H0).**\n\n")
-  cat("Since p-value (", format(p_value, scientific = TRUE, digits = 3), ") >= α (0.05),\n")
+  cat("Since p-value (", format(p_value, scientific = TRUE, digits = 3), ") >=  (0.05),\n")
   cat("we do not have sufficient evidence that mean enrollment duration differs across runs.\n")
 }
 ```
 Learners in different runs stay enrolled for different average lengths of time, and this is not just random noise. Some runs (e.g. Run 1) keep learners much longer while others (e.g. Run 7) lose them much sooner.
 
----
 
-# 4. Supporting Hypothesis Tests
+# 10. Supporting Hypothesis Tests
 
-## 4.1 Hypothesis H2: Completion Rate by Course Run (Chi-Squared Test)
+## 10.1 Hypothesis H2: Completion Rate by Course Run (Chi-Squared Test)
 
 ```{r h1-chi-squared}
 # Create contingency table
@@ -856,7 +853,7 @@ kable(completion_rates,
                 full_width = FALSE)
 ```
 
-## 4.2 Hypothesis H3: Duration by Age Group (One-Way ANOVA, Available Data)
+## 10.2 Hypothesis H3: Duration by Age Group (One-Way ANOVA, Available Data)
 
 ```{r h3-anova}
 # Filter to rows with age group information (not "Unknown")
@@ -901,9 +898,8 @@ if (nrow(h3_data) > 0 && nlevels(h3_data$demo_age_group) >= 2) {
   cat("Insufficient known age group data for H3 analysis.\n")
 }
 ```
----
 
-# 5. Summary of Hypothesis Tests
+# 11. Summary of Hypothesis Tests
 
 ```{r hypothesis-summary, results='asis'}
 f_h3 <- NA_real_
@@ -942,10 +938,9 @@ kable(hypothesis_summary,
 cat("\n*Asterisk indicates statistical significance at α = 0.05 level.")
 ```
 
----
-# 6. Key Findings & Interpretation
+# 12. Key Findings & Interpretation
 
-## 6.1 Main Finding: H2 (Primary Focus)
+## 12.1 Main Finding: H2 (Primary Focus)
 
 ```{r finding-h1-text}
 cat("**H1 RESULT:**\n\n")
@@ -970,7 +965,7 @@ cat("This could reflect differences in course pacing, content difficulty, suppor
 cat("or instructor engagement across runs.\n")
 ```
 
-## 6.2 Supporting Findings: H2 & H3
+## 12.2 Supporting Findings: H2 & H3
 
 ```{r finding-h2-h3}
 cat("**H2 (Completion by Course Run):**\n")
@@ -983,10 +978,9 @@ if (chi2_result$p.value < 0.05) {
 }
 ```
 
----
-# 7. Recommendations Based on Statistical Findings
+# 13. Recommendations Based on Statistical Findings
 
-## 7.1 Course-Run Specific Actions
+## 13.1 Course-Run Specific Actions
 
 ```{r recommendations, results='asis'}
 recommendations <- tibble(
@@ -1017,7 +1011,7 @@ kable(recommendations,
                 full_width = FALSE)
 ```
 
-## 7.2 Demographic-Specific Actions (Limited by Data)
+## 13.2 Demographic-Specific Actions (Limited by Data)
 
 ```{r demographic-actions}
 cat("**Demographic Considerations:**\n\n")
@@ -1027,12 +1021,11 @@ cat("- **Education/Employment:** Similar low response rate (11–12% complete de
 cat("  Recommendation: Incentivize demographic completion (e.g., certificate milestone) in Cycle 3.\n\n")
 cat("Action: Collect richer demographics in next cycle to enable targeted support by age/background.\n")
 ```
----
 
-# 8. CRISP-DM Cycle 2 Evaluation Summary
+# 14. CRISP-DM Cycle 2 Evaluation Summary
 
 
-## 8.1 Key Statistical Outputs
+## 14.1 Key Statistical Outputs
 
 | Test | Statistic | p-value | Conclusion |
 |------|-----------|---------|------------|
@@ -1042,10 +1035,9 @@ cat("Action: Collect richer demographics in next cycle to enable targeted suppor
 
 *p < 0.05; results are statistically significant at the 5% level.
 
----
-# 9. Conclusion
+# 15. Conclusion
 
-## 9.1 Summary
+## 15.1 Summary
 
 This Cycle 2 analysis confirms that **mean enrollment duration is statistically significantly different across course runs** (H1, p < 0.05). Learners in Run 1 disengage ~27 days earlier than learners in Run 5, a difference that is both statistically and practically meaningful.
 
@@ -1053,7 +1045,7 @@ Supporting evidence shows:
 - **H2 (Completion by Run):** Also significant, suggesting run quality directly impacts engagement outcomes.  
 - **H3 (Age Group):** Limited data, but no strong effect detected among available respondents.  
 
-## 9.2 Limitations
+## 15.2 Limitations
 
 1. **Missing Demographics:** 88% of learners did not provide age/education/employment data, limiting segmentation analysis.  
 2. **No Causal Mechanism:** Statistical significance shows *that* differences exist, not *why* they exist.  

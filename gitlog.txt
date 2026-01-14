@@ -1,3 +1,9 @@
+commit 60a17ff3e2cd721584d54cc2be5a97c0936a3a8c
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Wed Jan 14 01:32:04 2026 +0000
+
+    Added both the cycles of Crisp-DM along with the test reports
+
 commit 8347bb361996313021581fc8f804193a85400380
 Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
 Date:   Mon Jan 12 01:04:07 2026 +0000
