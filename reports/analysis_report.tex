@@ -1,0 +1,575 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Learning Analytics MOOC Engagement Analysis},
+  pdfauthor={Pranit Chatterjee},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Learning Analytics MOOC Engagement Analysis}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{MAS8600/MAS8505 Coursework}
+\author{Pranit Chatterjee}
+\date{January 13, 2026}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Executive Summary}\label{executive-summary}
+
+This analysis examines learner engagement patterns across 7 runs of a
+MOOC using data from 37,296 enrollment records. Using CRISP-DM
+methodology, we identify key engagement drivers and completion barriers.
+Early findings indicate low completion rates (\textasciitilde5.8\%),
+with significant demographic data gaps (\textgreater88\% missing). Most
+unenrolled learners disengage within 72 days of enrollment.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{1. Business Understanding}\label{business-understanding}
+
+\subsection{1.1 Business Objective}\label{business-objective}
+
+The primary objective is to understand MOOC learner engagement and
+identify patterns in:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Course completion rates} by learner cohort\\
+\item
+  \textbf{Unenrollment timing} and duration patterns\\
+\item
+  \textbf{Certificate purchase behavior} (indicator of serious
+  engagement)\\
+\item
+  \textbf{Demographic factors} influencing engagement
+\end{itemize}
+
+\subsection{1.2 Success Criteria}\label{success-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Identify engagement segments (completers, active, unenrolled).\\
+\item
+  Quantify completion rates and conversion to certificates.\\
+\item
+  Provide actionable insights for retention strategies.
+\end{itemize}
+
+\subsection{1.3 Data Overview}\label{data-overview}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Total enrollments:} 37,296 learners across 7 course runs\\
+\item
+  \textbf{Time period:} 2016--2018\\
+\item
+  \textbf{Key variables:} Enrollment, unenrollment, course completion,
+  demographics
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{2. Data Understanding}\label{data-understanding}
+
+\subsection{2.1 Data Quality Assessment}\label{data-quality-assessment}
+
+\subsubsection{Data Loading}\label{data-loading}
+
+\subsubsection{Feature Engineering}\label{feature-engineering}
+
+\subsubsection{Missing Values Summary}\label{missing-values-summary}
+
+\begin{longtable}[t]{lrrl}
+\caption{\label{tab:missing-values}Data Quality Assessment: Missing Values}\\
+\toprule
+Column & Missing\_Count & Missing\_Pct & Data\_Quality\\
+\midrule
+purchased\_statement\_at & 37007 & 99.2 & Poor\\
+fully\_participated\_at & 35142 & 94.2 & Poor\\
+unenrolled\_at & 33105 & 88.8 & Poor\\
+unenrolled\_date & 33105 & 88.8 & Poor\\
+enrollment\_duration & 33105 & 88.8 & Poor\\
+\addlinespace
+detected\_country & 22 & 0.1 & Good\\
+learner\_id & 0 & 0.0 & Complete\\
+enrolled\_at & 0 & 0.0 & Complete\\
+role & 0 & 0.0 & Complete\\
+gender & 0 & 0.0 & Complete\\
+\addlinespace
+country & 4 & 0.0 & Complete\\
+age\_range & 0 & 0.0 & Complete\\
+highest\_education\_level & 0 & 0.0 & Complete\\
+employment\_status & 0 & 0.0 & Complete\\
+employment\_area & 0 & 0.0 & Complete\\
+\addlinespace
+course\_run & 0 & 0.0 & Complete\\
+enrolled\_date & 0 & 0.0 & Complete\\
+fully\_participated & 0 & 0.0 & Complete\\
+purchased\_statement & 0 & 0.0 & Complete\\
+unenrolled & 0 & 0.0 & Complete\\
+\addlinespace
+engagement\_status & 0 & 0.0 & Complete\\
+\bottomrule
+\end{longtable}
+
+\textbf{Interpretation:} Temporal variables (enrollment, unenrollment,
+completion dates) are 100\% complete. Demographic variables show
+\textgreater88\% missing, indicating limited self-reported data from
+learners.
+
+\subsubsection{``Unknown'' Values in Categorical
+Fields}\label{unknown-values-in-categorical-fields}
+
+\begin{longtable}[t]{lrr}
+\caption{\label{tab:unknown-values}Unknown/Not Specified Values in Demographic Fields}\\
+\toprule
+Field & Unknown\_Count & Pct\_Total\\
+\midrule
+Gender & 33137 & 88.8\\
+Age Range & 33268 & 89.2\\
+Education Level & 33161 & 88.9\\
+Employment Status & 33191 & 89.0\\
+\bottomrule
+\end{longtable}
+
+\subsection{2.2 Enrollment Timeline}\label{enrollment-timeline}
+
+\begin{verbatim}
+## **Enrollment Date Range:**
+\end{verbatim}
+
+\begin{verbatim}
+## - Earliest enrollment: March 30, 2016
+\end{verbatim}
+
+\begin{verbatim}
+## - Latest enrollment: November 01, 2018
+\end{verbatim}
+
+\begin{verbatim}
+## - Time span: 946 days (~ 2.6 years)
+\end{verbatim}
+
+\subsection{2.3 Key Data
+Characteristics}\label{key-data-characteristics}
+
+\begin{longtable}[t]{lr}
+\caption{\label{tab:data-characteristics}Dataset Characteristics}\\
+\toprule
+Metric & Value\\
+\midrule
+Total Enrollments & 37,296\\
+Unique Course Runs & 7\\
+Date Range (days) & 946\\
+Complete Demographics & 0\\
+With Gender & 4159\\
+\addlinespace
+With Age Range & 4028\\
+With Education Level & 4135\\
+With Employment Status & 4105\\
+\bottomrule
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{3. Data Preparation}\label{data-preparation}
+
+\subsection{3.1 Data Cleaning Steps}\label{data-cleaning-steps}
+
+The following transformations were applied:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Date Conversion:} All date-time strings converted to proper
+  Date objects (\texttt{enrolled\_date}, \texttt{unenrolled\_date},
+  \texttt{fully\_participated\_date},
+  \texttt{purchased\_statement\_date}).
+\item
+  \textbf{Standardization:} ``Unknown'' values in demographic fields
+  converted to \texttt{NA} for proper handling.
+\item
+  \textbf{Course Run Coding:} Each enrollment tagged with its course run
+  (1--7) for comparative analysis.
+\end{enumerate}
+
+\subsection{3.2 Feature Engineering}\label{feature-engineering-1}
+
+New derived variables created for engagement analysis:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3462}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4231}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2308}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Feature
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{fully\_participated} & TRUE if learner reached course completion
+milestone & Binary \\
+\texttt{purchased\_statement} & TRUE if learner purchased
+certificate/statement & Binary \\
+\texttt{unenrolled} & TRUE if learner unenrolled before course end &
+Binary \\
+\texttt{enrollment\_duration} & Days between enrollment and unenrollment
+& Numeric \\
+\texttt{engagement\_status} & Categorical: ``Completed'',
+``Unenrolled'', ``Still Active / Unknown'' & Factor \\
+\texttt{has\_demographics} & TRUE if learner provided complete
+demographic data & Binary \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{4. Exploratory Data Analysis}\label{exploratory-data-analysis}
+
+\subsection{4.1 Engagement Status
+Distribution}\label{engagement-status-distribution}
+
+\subsubsection{Summary Statistics}\label{summary-statistics}
+
+\begin{longtable}[t]{lrrr}
+\caption{\label{tab:engagement-summary}Learner Engagement Status}\\
+\toprule
+Engagement Status & Count & Percentage & Cumulative\_Pct\\
+\midrule
+Completed & 2154 & 5.78 & 5.78\\
+Still Active / Unknown & 31073 & 83.31 & 89.09\\
+Unenrolled & 4069 & 10.91 & 100.00\\
+\bottomrule
+\end{longtable}
+
+\subsubsection{Visualization: Engagement
+Status}\label{visualization-engagement-status}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{analysis_report_files/figure-latex/engagement-plot-1.pdf}}
+\caption{Distribution of learners by engagement status}
+\end{figure}
+
+\subsection{4.2 Completion Analysis}\label{completion-analysis}
+
+\subsubsection{Completion Indicators}\label{completion-indicators}
+
+\begin{longtable}[t]{lrr}
+\caption{\label{tab:completion-summary}Completion and Engagement Indicators}\\
+\toprule
+Indicator & Count & Percentage\\
+\midrule
+Fully Participated & 2154 & 5.78\\
+Purchased Statement & 289 & 0.77\\
+Unenrolled & 4191 & 11.24\\
+\bottomrule
+\end{longtable}
+
+\textbf{Key Insights:}
+
+\begin{itemize}
+\tightlist
+\item
+  Only \textbf{5.78\% (2,154 learners)} fully participated in the
+  course.
+\item
+  \textbf{0.77\% (289 learners)} purchased a certificate/statement,
+  indicating very limited willingness to pay.
+\item
+  \textbf{11.24\% (4,191 learners)} unenrolled before course end.
+\item
+  \textbf{82.21\% (30,762 learners)} remain in ``Still Active /
+  Unknown'' status, likely representing informal or discontinued
+  engagement.
+\end{itemize}
+
+\subsubsection{Visualization: Completion
+Funnel}\label{visualization-completion-funnel}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{analysis_report_files/figure-latex/completion-funnel-1.pdf}}
+\caption{Completion funnel showing progression from enrollment to
+certificate purchase}
+\end{figure}
+
+\subsection{4.3 Unenrollment Duration
+Analysis}\label{unenrollment-duration-analysis}
+
+\subsubsection{Duration Statistics}\label{duration-statistics}
+
+\begin{longtable}[t]{lr}
+\caption{\label{tab:duration-stats}Unenrollment Duration Statistics (Days)}\\
+\toprule
+Metric & Value\_Days\\
+\midrule
+Mean & 123.6\\
+Median & 72.0\\
+Std. Dev & 144.6\\
+Min & 0.0\\
+Max & 889.0\\
+\addlinespace
+Q1 & 30.0\\
+Q3 & 157.0\\
+\bottomrule
+\end{longtable}
+
+\textbf{Interpretation:} Unenrolled learners persist for an average of
+\textbf{124 days} (median: \textbf{72 days}), with high variability (SD:
+145 days). This suggests a critical drop-off window around 2--3 months
+post-enrollment.
+
+\subsubsection{Visualization: Duration
+Distribution}\label{visualization-duration-distribution}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{analysis_report_files/figure-latex/duration-histogram-1.pdf}}
+\caption{Distribution of days from enrollment to unenrollment}
+\end{figure}
+
+\subsubsection{Visualization: Unenrollment by Duration
+Quartile}\label{visualization-unenrollment-by-duration-quartile}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{analysis_report_files/figure-latex/duration-quartiles-1.pdf}}
+\caption{Breakdown of unenrollments by duration quartiles}
+\end{figure}
+
+\subsection{4.4 Engagement by Course
+Run}\label{engagement-by-course-run}
+
+\subsubsection{Completion Rates Across
+Runs}\label{completion-rates-across-runs}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:run-comparison}Engagement Metrics by Course Run}\\
+\toprule
+Course Run & Enroll \# & Complete \# & Complete \% & Unenroll \# & Unenroll \% & Purchase \# & Purchase \% & Avg Days\\
+\midrule
+1 & 14394 & 1803 & 12.53 & 1212 & 8.42 & 84 & 0.584 & 180.4\\
+2 & 6488 & 33 & 0.51 & 1200 & 18.50 & 38 & 0.586 & 147.2\\
+3 & 3361 & 56 & 1.67 & 500 & 14.88 & 30 & 0.893 & 90.8\\
+4 & 3992 & 166 & 4.16 & 560 & 14.03 & 40 & 1.002 & 70.3\\
+5 & 3544 & 22 & 0.62 & 407 & 11.48 & 35 & 0.988 & 58.2\\
+\addlinespace
+6 & 3175 & 31 & 0.98 & 203 & 6.39 & 39 & 1.228 & 50.8\\
+7 & 2342 & 43 & 1.84 & 109 & 4.65 & 23 & 0.982 & 36.4\\
+\bottomrule
+\end{longtable}
+
+\subsubsection{Visualization: Completion Rate by
+Run}\label{visualization-completion-rate-by-run}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{analysis_report_files/figure-latex/run-completion-plot-1.pdf}}
+\caption{Completion rates vary across course runs}
+\end{figure}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{5. Key Findings \& Insights}\label{key-findings-insights}
+
+\subsection{5.1 Engagement Patterns}\label{engagement-patterns}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Very Low Completion:} Only 5.78\% of enrollments result in
+  full course participation, indicating a significant engagement
+  challenge.
+\item
+  \textbf{Low Monetization:} Certificate/statement purchase rate is
+  extremely low (0.77\%), suggesting limited perceived value or
+  willingness to pay among learners.
+\item
+  \textbf{High Unenrollment:} 11.24\% of learners actively unenroll,
+  with a median time of \textbf{72 days}---indicating most drop-off
+  occurs in the first 2--3 months.
+\item
+  \textbf{Large ``Unknown'' Cohort:} 82.21\% of enrollments fall into
+  ``Still Active / Unknown,'' likely representing learners who stop
+  engaging informally without formal unenrollment.
+\end{enumerate}
+
+\subsection{5.2 Critical Drop-Off
+Window}\label{critical-drop-off-window}
+
+The unenrollment duration analysis reveals:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{41\% of unenrolled learners} drop out within the first week.\\
+\item
+  \textbf{Median persistence:} 72 days (approximately 10 weeks).\\
+\item
+  \textbf{Max persistence:} 889 days (\textasciitilde2.4 years),
+  indicating some long-term lurkers.
+\end{itemize}
+
+This suggests an \textbf{early intervention window (weeks 1--10)} is
+critical for retention.
+
+\subsection{5.3 Data Quality
+Implications}\label{data-quality-implications}
+
+High missing demographic data (\textgreater88\%) limits demographic
+segmentation. Analysis cannot confidently compare engagement by age,
+education, or employment without imputation or assumptions.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{6. Conclusions \&
+Recommendations}\label{conclusions-recommendations}
+
+\subsection{6.1 Conclusions}\label{conclusions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{MOOC completion is rare} (\textasciitilde5.8\%), and
+  conversion to paid certificates is minimal (\textasciitilde0.8\%).\\
+\item
+  \textbf{Most disengagement is informal}---learners don't formally
+  unenroll; they simply stop participating.\\
+\item
+  \textbf{Early weeks are critical}---42\% of unenrollments occur within
+  1 week; the median is \textasciitilde10 weeks.\\
+\item
+  \textbf{Demographic factors are unmeasured}---missing data prevents
+  deeper segmentation analysis.
+\end{enumerate}
+
+\subsection{6.2 Recommendations for Next
+Cycle}\label{recommendations-for-next-cycle}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Improve learner onboarding} in weeks 1--2 to reduce immediate
+  drop-off.\\
+\item
+  \textbf{Implement engagement checkpoints} at week 2, 4, and 8 to
+  re-activate at-risk learners.\\
+\item
+  \textbf{Collect demographic data} through mandatory profile completion
+  to enable segmentation analysis.\\
+\item
+  \textbf{Investigate ``Still Active'' cohort} to distinguish true
+  lurkers from inactive accounts.\\
+\item
+  \textbf{Pilot retention interventions} (e.g., peer support, milestone
+  rewards) for next course run.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\end{document}

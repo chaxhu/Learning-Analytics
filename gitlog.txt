@@ -1,0 +1,29 @@
+commit 8347bb361996313021581fc8f804193a85400380
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Mon Jan 12 01:04:07 2026 +0000
+
+    Completed cycle 1 of Crisp-DM with analysis report
+
+commit 6eeeb8841a0167c2bebed238f2591acb884d81dc
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Sun Jan 11 16:06:21 2026 +0000
+
+    added feature creation in the munge file
+
+commit f3dfd14b96cfe8ef3704169e63a1e1ce0cd9d973
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Sun Jan 11 14:51:20 2026 +0000
+
+    added data cleaning munge file
+
+commit 98d1382e107eff0c5eeec51b329960125985e93e
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Sat Jan 10 20:42:38 2026 +0000
+
+    ProjectTemplate structure and data loading in place
+
+commit d378fcbf0666da78c5953db28d79c8b2cd8b6441
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Sat Jan 10 20:29:28 2026 +0000
+
+    Implemented data loading step and combine all 7 CSVs
