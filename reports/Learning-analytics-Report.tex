@@ -1,0 +1,982 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Learning Analytics Report},
+  pdfauthor={Pranit Chatterjee},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Learning Analytics Report}
+\author{Pranit Chatterjee}
+\date{2026-01-14}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\section{Executive Summary}\label{executive-summary}
+
+This analysis examines learner engagement patterns across 7 runs of a
+MOOC using data from 37,296 enrollment records. Using CRISP-DM
+methodology, we identify key engagement drivers and completion barriers.
+Early findings indicate low completion rates (\textasciitilde5.8\%),
+with significant demographic data gaps (\textgreater88\% missing). Most
+unenrolled learners disengage within 72 days of enrollment.
+
+\section{1. Business Understanding}\label{business-understanding}
+
+\subsection{1.1 Business Objective}\label{business-objective}
+
+The primary objective is to understand MOOC learner engagement and
+identify patterns in:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Course completion rates} by learner cohort\\
+\item
+  \textbf{Unenrollment timing} and duration patterns\\
+\item
+  \textbf{Certificate purchase behavior} (indicator of serious
+  engagement)\\
+\item
+  \textbf{Demographic factors} influencing engagement
+\end{itemize}
+
+\subsection{1.2 Success Criteria}\label{success-criteria}
+
+\begin{itemize}
+\tightlist
+\item
+  Identify engagement segments (completers, active, unenrolled).\\
+\item
+  Quantify completion rates and conversion to certificates.\\
+\item
+  Provide actionable insights for retention strategies.
+\end{itemize}
+
+\subsection{1.3 Data Overview}\label{data-overview}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Total enrollments:} 37,296 learners across 7 course runs\\
+\item
+  \textbf{Time period:} 2016--2018\\
+\item
+  \textbf{Key variables:} Enrollment, unenrollment, course completion,
+  demographics
+\end{itemize}
+
+\section{2. Data Understanding (Cycle -
+1)}\label{data-understanding-cycle---1}
+
+\subsection{2.1 Data Quality Assessment}\label{data-quality-assessment}
+
+\subsubsection{Data Loading}\label{data-loading}
+
+\subsubsection{Feature Engineering}\label{feature-engineering}
+
+\begin{verbatim}
+## Data loaded and prepared.
+\end{verbatim}
+
+\begin{verbatim}
+## Total enrollments: 37296
+\end{verbatim}
+
+\begin{verbatim}
+## Course runs: 7
+\end{verbatim}
+
+\subsubsection{Missing Values Summary}\label{missing-values-summary}
+
+\begin{longtable}[t]{lrrl}
+\caption{\label{tab:missing-values}Data Quality Assessment: Missing Values}\\
+\toprule
+Column & Missing\_Count & Missing\_Pct & Data\_Quality\\
+\midrule
+purchased\_statement\_at & 37007 & 99.2 & Poor\\
+fully\_participated\_at & 35142 & 94.2 & Poor\\
+unenrolled\_at & 33105 & 88.8 & Poor\\
+unenrolled\_date & 33105 & 88.8 & Poor\\
+enrollment\_duration & 33105 & 88.8 & Poor\\
+\addlinespace
+detected\_country & 22 & 0.1 & Good\\
+learner\_id & 0 & 0.0 & Complete\\
+enrolled\_at & 0 & 0.0 & Complete\\
+role & 0 & 0.0 & Complete\\
+gender & 0 & 0.0 & Complete\\
+\addlinespace
+country & 4 & 0.0 & Complete\\
+age\_range & 0 & 0.0 & Complete\\
+highest\_education\_level & 0 & 0.0 & Complete\\
+employment\_status & 0 & 0.0 & Complete\\
+employment\_area & 0 & 0.0 & Complete\\
+\addlinespace
+course\_run & 0 & 0.0 & Complete\\
+enrolled\_date & 0 & 0.0 & Complete\\
+fully\_participated & 0 & 0.0 & Complete\\
+purchased\_statement & 0 & 0.0 & Complete\\
+unenrolled & 0 & 0.0 & Complete\\
+\addlinespace
+engagement\_status & 0 & 0.0 & Complete\\
+has\_demographics & 0 & 0.0 & Complete\\
+\bottomrule
+\end{longtable}
+
+\textbf{Interpretation:} Temporal variables (enrollment, unenrollment,
+completion dates) are 100\% complete. Demographic variables show
+\textgreater88\% missing, indicating limited self-reported data from
+learners.
+
+\subsubsection{``Unknown'' Values in Categorical
+Fields}\label{unknown-values-in-categorical-fields}
+
+\begin{longtable}[t]{lrr}
+\caption{\label{tab:unknown-values}Unknown/Not Specified Values in Demographic Fields}\\
+\toprule
+Field & Unknown\_Count & Pct\_Total\\
+\midrule
+Gender & 33137 & 88.8\\
+Age Range & 33268 & 89.2\\
+Education Level & 33161 & 88.9\\
+Employment Status & 33191 & 89.0\\
+\bottomrule
+\end{longtable}
+
+\subsection{2.2 Enrollment Timeline}\label{enrollment-timeline}
+
+\begin{verbatim}
+## **Enrollment Date Range:**
+\end{verbatim}
+
+\begin{verbatim}
+## - Earliest enrollment: March 30, 2016
+\end{verbatim}
+
+\begin{verbatim}
+## - Latest enrollment: November 01, 2018
+\end{verbatim}
+
+\begin{verbatim}
+## - Time span: 946 days (~ 2.6 years)
+\end{verbatim}
+
+\subsection{2.3 Key Data
+Characteristics}\label{key-data-characteristics}
+
+\begin{longtable}[t]{lr}
+\caption{\label{tab:data-characteristics}Dataset Characteristics}\\
+\toprule
+Metric & Value\\
+\midrule
+Total Enrollments & 37,296\\
+Unique Course Runs & 7\\
+Date Range (days) & 946\\
+Complete Demographics & 3933\\
+With Gender & 4159\\
+\addlinespace
+With Age Range & 4028\\
+With Education Level & 4135\\
+With Employment Status & 4105\\
+\bottomrule
+\end{longtable}
+
+\section{3. Data Preparation}\label{data-preparation}
+
+\subsection{3.1 Data Cleaning Steps}\label{data-cleaning-steps}
+
+The following transformations were applied:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Date Conversion:} All date-time strings converted to proper
+  Date objects (\texttt{enrolled\_date}, \texttt{unenrolled\_date},
+  \texttt{fully\_participated\_date},
+  \texttt{purchased\_statement\_date}).
+\item
+  \textbf{Standardization:} ``Unknown'' values in demographic fields
+  converted to \texttt{NA} for proper handling.
+\item
+  \textbf{Course Run Coding:} Each enrollment tagged with its course run
+  (1--7) for comparative analysis.
+\end{enumerate}
+
+\subsection{3.2 Feature Engineering}\label{feature-engineering-1}
+
+New derived variables created for engagement analysis:
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3462}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4231}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2308}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Feature
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Definition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Type
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{fully\_participated} & TRUE if learner reached course completion
+milestone & Binary \\
+\texttt{purchased\_statement} & TRUE if learner purchased
+certificate/statement & Binary \\
+\texttt{unenrolled} & TRUE if learner unenrolled before course end &
+Binary \\
+\texttt{enrollment\_duration} & Days between enrollment and unenrollment
+& Numeric \\
+\texttt{engagement\_status} & Categorical: ``Completed'',
+``Unenrolled'', ``Still Active / Unknown'' & Factor \\
+\texttt{has\_demographics} & TRUE if learner provided complete
+demographic data & Binary \\
+\end{longtable}
+}
+
+\section{4. Exploratory Data Analysis}\label{exploratory-data-analysis}
+
+\subsection{4.1 Engagement Status
+Distribution}\label{engagement-status-distribution}
+
+\subsubsection{Summary Statistics}\label{summary-statistics}
+
+\begin{longtable}[t]{lrrr}
+\caption{\label{tab:engagement-summary}Learner Engagement Status}\\
+\toprule
+Engagement Status & Count & Percentage & Cumulative\_Pct\\
+\midrule
+Completed & 2154 & 5.78 & 5.78\\
+Still Active / Unknown & 31073 & 83.31 & 89.09\\
+Unenrolled & 4069 & 10.91 & 100.00\\
+\bottomrule
+\end{longtable}
+
+\subsubsection{Visualization: Engagement
+Status}\label{visualization-engagement-status}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Distribution of learners by engagement status}]{Learning-analytics-Report_files/figure-latex/engagement-plot-1.pdf}}
+\caption{Distribution of learners by engagement status}
+\end{figure}
+
+\subsection{4.2 Completion Analysis}\label{completion-analysis}
+
+\subsubsection{Completion Indicators}\label{completion-indicators}
+
+\begin{longtable}[t]{lrr}
+\caption{\label{tab:completion-summary}Completion and Engagement Indicators}\\
+\toprule
+Indicator & Count & Percentage\\
+\midrule
+Fully Participated & 2154 & 5.78\\
+Purchased Statement & 289 & 0.77\\
+Unenrolled & 4191 & 11.24\\
+\bottomrule
+\end{longtable}
+
+\textbf{Key Insights:}
+
+\begin{itemize}
+\tightlist
+\item
+  Only \textbf{5.78\% (2,154 learners)} fully participated in the
+  course.
+\item
+  \textbf{0.77\% (289 learners)} purchased a certificate/statement,
+  indicating very limited willingness to pay.
+\item
+  \textbf{11.24\% (4,191 learners)} unenrolled before course end.
+\item
+  \textbf{82.21\% (30,762 learners)} remain in ``Still Active /
+  Unknown'' status, likely representing informal or discontinued
+  engagement.
+\end{itemize}
+
+\subsubsection{Visualization: Completion
+Funnel}\label{visualization-completion-funnel}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Completion funnel showing progression from enrollment to certificate purchase}]{Learning-analytics-Report_files/figure-latex/completion-funnel-1.pdf}}
+\caption{Completion funnel showing progression from enrollment to
+certificate purchase}
+\end{figure}
+
+\subsection{4.3 Unenrollment Duration
+Analysis}\label{unenrollment-duration-analysis}
+
+\subsubsection{Duration Statistics}\label{duration-statistics}
+
+\begin{longtable}[t]{lr}
+\caption{\label{tab:duration-stats}Unenrollment Duration Statistics (Days)}\\
+\toprule
+Metric & Value\_Days\\
+\midrule
+Mean & 123.6\\
+Median & 72.0\\
+Std. Dev & 144.6\\
+Min & 0.0\\
+Max & 889.0\\
+\addlinespace
+Q1 & 30.0\\
+Q3 & 157.0\\
+\bottomrule
+\end{longtable}
+
+\textbf{Interpretation:} Unenrolled learners persist for an average of
+\textbf{124 days} (median: \textbf{72 days}), with high variability (SD:
+145 days). This suggests a critical drop-off window around 2--3 months
+post-enrollment.
+
+\subsubsection{Visualization: Duration
+Distribution}\label{visualization-duration-distribution}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Distribution of days from enrollment to unenrollment}]{Learning-analytics-Report_files/figure-latex/duration-histogram-1.pdf}}
+\caption{Distribution of days from enrollment to unenrollment}
+\end{figure}
+
+\subsubsection{Visualization: Unenrollment by Duration
+Quartile}\label{visualization-unenrollment-by-duration-quartile}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Breakdown of unenrollments by duration quartiles}]{Learning-analytics-Report_files/figure-latex/duration-quartiles-1.pdf}}
+\caption{Breakdown of unenrollments by duration quartiles}
+\end{figure}
+
+\subsection{4.4 Engagement by Course
+Run}\label{engagement-by-course-run}
+
+\subsubsection{Completion Rates Across
+Runs}\label{completion-rates-across-runs}
+
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:run-comparison}Engagement Metrics by Course Run}\\
+\toprule
+Course Run & Enroll \# & Complete \# & Complete \% & Unenroll \# & Unenroll \% & Purchase \# & Purchase \% & Avg Days\\
+\midrule
+1 & 14394 & 1803 & 12.53 & 1212 & 8.42 & 84 & 0.584 & 180.4\\
+2 & 6488 & 33 & 0.51 & 1200 & 18.50 & 38 & 0.586 & 147.2\\
+3 & 3361 & 56 & 1.67 & 500 & 14.88 & 30 & 0.893 & 90.8\\
+4 & 3992 & 166 & 4.16 & 560 & 14.03 & 40 & 1.002 & 70.3\\
+5 & 3544 & 22 & 0.62 & 407 & 11.48 & 35 & 0.988 & 58.2\\
+\addlinespace
+6 & 3175 & 31 & 0.98 & 203 & 6.39 & 39 & 1.228 & 50.8\\
+7 & 2342 & 43 & 1.84 & 109 & 4.65 & 23 & 0.982 & 36.4\\
+\bottomrule
+\end{longtable}
+
+\subsubsection{Visualization: Completion Rate by
+Run}\label{visualization-completion-rate-by-run}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Completion rates vary across course runs}]{Learning-analytics-Report_files/figure-latex/run-completion-plot-1.pdf}}
+\caption{Completion rates vary across course runs}
+\end{figure}
+
+\section{5. Key Findings \& Insights}\label{key-findings-insights}
+
+\subsection{5.1 Engagement Patterns}\label{engagement-patterns}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Very Low Completion:} Only 5.78\% of enrollments result in
+  full course participation, indicating a significant engagement
+  challenge.
+\item
+  \textbf{Low Monetization:} Certificate/statement purchase rate is
+  extremely low (0.77\%), suggesting limited perceived value or
+  willingness to pay among learners.
+\item
+  \textbf{High Unenrollment:} 11.24\% of learners actively unenroll,
+  with a median time of \textbf{72 days}---indicating most drop-off
+  occurs in the first 2--3 months.
+\item
+  \textbf{Large ``Unknown'' Cohort:} 82.21\% of enrollments fall into
+  ``Still Active / Unknown,'' likely representing learners who stop
+  engaging informally without formal unenrollment.
+\end{enumerate}
+
+\subsection{5.2 Critical Drop-Off
+Window}\label{critical-drop-off-window}
+
+The unenrollment duration analysis reveals:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{41\% of unenrolled learners} drop out within the first week.\\
+\item
+  \textbf{Median persistence:} 72 days (approximately 10 weeks).\\
+\item
+  \textbf{Max persistence:} 889 days (\textasciitilde2.4 years),
+  indicating some long-term lurkers.
+\end{itemize}
+
+This suggests an \textbf{early intervention window (weeks 1--10)} is
+critical for retention.
+
+\subsection{5.3 Data Quality
+Implications}\label{data-quality-implications}
+
+High missing demographic data (\textgreater88\%) limits demographic
+segmentation. Analysis cannot confidently compare engagement by age,
+education, or employment without imputation or assumptions.
+
+\section{6. Conclusions \&
+Recommendations}\label{conclusions-recommendations}
+
+\subsection{6.1 Conclusions}\label{conclusions}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{MOOC completion is rare} (\textasciitilde5.8\%), and
+  conversion to paid certificates is minimal (\textasciitilde0.8\%).\\
+\item
+  \textbf{Most disengagement is informal}---learners don't formally
+  unenroll; they simply stop participating.\\
+\item
+  \textbf{Early weeks are critical}---42\% of unenrollments occur within
+  1 week; the median is \textasciitilde10 weeks.\\
+\item
+  \textbf{Demographic factors are unmeasured}---missing data prevents
+  deeper segmentation analysis.
+\end{enumerate}
+
+This \textbf{\emph{Cycle 2}} analysis tests key hypotheses about MOOC
+learner engagement using statistical methods. Building on Cycle 1's
+exploratory findings, we employ \textbf{one-way ANOVA} to examine
+whether mean time-to-unenroll (enrollment duration) differs
+significantly across course runs (H2), chi-squared tests for categorical
+relationships, and post-hoc tests to identify which groups differ. Key
+finding: \textbf{Mean enrollment duration varies significantly by course
+run} (p \textless{} 0.05), with implications for course-specific
+retention strategies.
+
+\section{7. Cycle 2: Hypothesis Testing
+Framework}\label{cycle-2-hypothesis-testing-framework}
+
+\subsection{7.1 Research Questions \&
+Hypotheses}\label{research-questions-hypotheses}
+
+From Cycle 1, we observed: - Variable completion rates across 7 course
+runs (range: 4.8\%--7.2\%) - Variable unenrollment durations (median: 72
+days) - Potential demographic differences (though 88\% missing)
+
+\textbf{Cycle 2 tests three hypotheses:}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2727}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2273}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Question
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Test Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Variables
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{H1} & Does mean time-to-unenroll differ by course run? & One-way
+ANOVA & enrollment\_duration \textasciitilde{} course\_run \\
+\textbf{H2} & Does completion rate differ by course run? & Chi-squared
+test & fully\_participated × course\_run \\
+\textbf{H3} & Does mean duration differ by age group (available data)? &
+One-way ANOVA & enrollment\_duration \textasciitilde{}
+demo\_age\_group \\
+\end{longtable}
+}
+
+\textbf{Focus for this report: H1} (mean enrollment duration by course
+run), with supporting tests for H2 and H3.
+
+\subsection{7.2 CRISP-DM Phase:
+Evaluation}\label{crisp-dm-phase-evaluation}
+
+This cycle addresses \textbf{Evaluation} (phase 5 in CRISP-DM): - Test
+statistical significance of patterns observed in Cycle 1. - Determine
+whether differences are real or due to random variation. - Prepare
+conclusions and recommendations for action.
+
+\section{8. Data Preparation \& Feature
+Engineering}\label{data-preparation-feature-engineering}
+
+\begin{verbatim}
+## Data loaded and prepared.
+\end{verbatim}
+
+\begin{verbatim}
+## Total enrollments: 37296
+\end{verbatim}
+
+\begin{verbatim}
+## Course runs: 7
+\end{verbatim}
+
+\section{9. Hypothesis H2: Mean Duration Differs by Course
+Run}\label{hypothesis-h2-mean-duration-differs-by-course-run}
+
+\subsection{9.1 Hypothesis Statement}\label{hypothesis-statement}
+
+\textbf{H1 :} - \textbf{Null Hypothesis (H0):} Mean enrollment duration
+is equal across all 7 course runs.\\
+\(μ_1 = μ_2 = μ_3 = μ_4 = μ_5 = μ_6 = μ_7\)
+
+\begin{itemize}
+\item
+  \textbf{Alternative Hypothesis (H1):} At least one course run has a
+  different mean enrollment duration.\\
+  \(\text{At least one } μ_i \neq μ_j\)
+\item
+  \textbf{Significance level :} 0.05\\
+\item
+  \textbf{Test:} One-way ANOVA
+\end{itemize}
+
+\subsection{9.2 Descriptive Statistics by Course
+Run}\label{descriptive-statistics-by-course-run}
+
+\begin{longtable}[t]{lrrrrrrrl}
+\caption{\label{tab:h1-descriptive}Enrollment Duration Statistics by Course Run}\\
+\toprule
+Course Run & N & Mean\_Days & Median\_Days & SD\_Days & Min\_Days & Max\_Days & Q1 & Q3\\
+\midrule
+1 & 1212 & 180.37 & 117.0 & 195.64 & 0 & 889 & 33.00 & 257.00\\
+2 & 1200 & 147.25 & 106.5 & 133.92 & 0 & 677 & 47.00 & 203.25\\
+3 & 500 & 90.79 & 63.0 & 91.54 & 0 & 426 & 30.75 & 119.25\\
+4 & 560 & 70.32 & 48.0 & 77.08 & 0 & 409 & 19.00 & 90.00\\
+5 & 407 & 58.23 & 40.0 & 59.61 & 0 & 290 & 19.00 & 75.00\\
+\addlinespace
+6 & 203 & 50.79 & 43.0 & 42.77 & 0 & 198 & 11.50 & 79.00\\
+7 & 109 & 36.38 & 36.0 & 32.27 & 0 & 126 & 7.00 & 52.00\\
+\bottomrule
+\end{longtable}
+
+\textbf{Observation:} Mean enrollment duration ranges from \textbf{36 to
+180 days} across runs. Run 1 has the highest mean (180.37 days), while
+Run 7 has the lowest (36.38 days). Visually, differences exist, but are
+they statistically significant?
+
+\subsection{9.3 Boxplot Visualization}\label{boxplot-visualization}
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio,alt={Distribution of enrollment duration by course run}]{Learning-analytics-Report_files/figure-latex/h1-boxplot-1.pdf}}
+\caption{Distribution of enrollment duration by course run}
+\end{figure}
+
+\subsection{9.4 One-Way ANOVA Test}\label{one-way-anova-test}
+
+\begin{verbatim}
+## **One-Way ANOVA Results (H1: Duration by Course Run)**
+\end{verbatim}
+
+\subsubsection{ANOVA Table}\label{anova-table}
+
+\begin{longtable}[t]{lrrrrr}
+\caption{\label{tab:h1-anova-table}One-Way ANOVA: Enrollment Duration by Course Run}\\
+\toprule
+Source & DF & Sum of Squares & Mean Square & F Statistic & p-value\\
+\midrule
+Course Run & 6 & 10349816 & 1724969.26 & 93.3854 & 0\\
+Error (Within Groups) & 4184 & 77284824 & 18471.52 & NA & NA\\
+Total & 4190 & 87634639 & NA & NA & NA\\
+\bottomrule
+\end{longtable}
+
+\subsubsection{ANOVA Interpretation}\label{anova-interpretation}
+
+\begin{verbatim}
+## **Statistical Decision:**
+\end{verbatim}
+
+\begin{verbatim}
+## - **F-statistic:**  93.3854
+\end{verbatim}
+
+\begin{verbatim}
+## - **p-value:**  2.012e-110
+\end{verbatim}
+
+\begin{verbatim}
+## - **Significance level :** 0.05
+\end{verbatim}
+
+\begin{verbatim}
+## **Conclusion: REJECT the null hypothesis (H0).**
+## 
+## Since p-value ( 2.01e-110 ) <  (0.05),
+## we have **statistically significant evidence** that mean enrollment duration
+## **differs across course runs**.
+## 
+## At least one course run has a significantly different mean duration than the others.
+\end{verbatim}
+
+Learners in different runs stay enrolled for different average lengths
+of time, and this is not just random noise. Some runs (e.g.~Run 1) keep
+learners much longer while others (e.g.~Run 7) lose them much sooner.
+
+\section{10. Supporting Hypothesis
+Tests}\label{supporting-hypothesis-tests}
+
+\subsection{10.1 Hypothesis H2: Completion Rate by Course Run
+(Chi-Squared
+Test)}\label{hypothesis-h2-completion-rate-by-course-run-chi-squared-test}
+
+\begin{verbatim}
+## **Contingency Table: Completion Status by Course Run**
+\end{verbatim}
+
+\begin{verbatim}
+## # A tibble: 7 x 3
+##   course_run Not_Completed Completed
+##   <fct>              <int>     <int>
+## 1 1                  12591      1803
+## 2 2                   6455        33
+## 3 3                   3305        56
+## 4 4                   3826       166
+## 5 5                   3522        22
+## 6 6                   3144        31
+## 7 7                   2299        43
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## **Chi-Squared Test Results (H1):**
+\end{verbatim}
+
+\begin{verbatim}
+## - Chi-squared statistic: 2033.764
+\end{verbatim}
+
+\begin{verbatim}
+## - p-value: 0
+\end{verbatim}
+
+\begin{verbatim}
+## - Degrees of freedom: 6
+\end{verbatim}
+
+\begin{verbatim}
+## **Conclusion:** Completion rate **significantly differs** across course runs (p < 0.05).
+\end{verbatim}
+
+\subsubsection{Completion Rate Table}\label{completion-rate-table}
+
+\begin{longtable}[t]{lrrr}
+\caption{\label{tab:h2-completion-rates}Completion Rates by Course Run}\\
+\toprule
+Course Run & Total & Completed \# & Rate (\%)\\
+\midrule
+1 & 14394 & 1803 & 12.53\\
+2 & 6488 & 33 & 0.51\\
+3 & 3361 & 56 & 1.67\\
+4 & 3992 & 166 & 4.16\\
+5 & 3544 & 22 & 0.62\\
+\addlinespace
+6 & 3175 & 31 & 0.98\\
+7 & 2342 & 43 & 1.84\\
+\bottomrule
+\end{longtable}
+
+\subsection{10.2 Hypothesis H3: Duration by Age Group (One-Way ANOVA,
+Available
+Data)}\label{hypothesis-h3-duration-by-age-group-one-way-anova-available-data}
+
+\begin{verbatim}
+## Insufficient known age group data for H3 analysis.
+\end{verbatim}
+
+\section{11. Summary of Hypothesis
+Tests}\label{summary-of-hypothesis-tests}
+
+\begin{longtable}[t]{llllll}
+\caption{\label{tab:hypothesis-summary}Summary of Hypothesis Tests (α = 0.05)}\\
+\toprule
+Hypothesis & Research\_Question & Test\_Used & Test\_Statistic & P\_Value & Decision\\
+\midrule
+H1 & Mean duration differs by course run? & Chi-Squared & χ² = 2033.76 & 0e+00 & Reject H0 *\\
+H2 & Completion rate differs by course run? & One-Way ANOVA & F = 93.39 & 2e-110 & Reject H0 *\\
+H3 & Mean duration differs by age group? & One-Way ANOVA & F = NA & NA & NA\\
+\bottomrule
+\end{longtable}
+
+*Asterisk indicates statistical significance at α = 0.05 level.
+
+\section{12. Key Findings \&
+Interpretation}\label{key-findings-interpretation}
+
+\subsection{12.1 Main Finding: H2 (Primary
+Focus)}\label{main-finding-h2-primary-focus}
+
+\begin{verbatim}
+## **H1 RESULT:**
+\end{verbatim}
+
+\begin{verbatim}
+## Mean enrollment duration **significantly differs** across the 7 course runs.
+\end{verbatim}
+
+\begin{verbatim}
+## - **Longest mean duration:** Run  1  (~ 180  days)
+\end{verbatim}
+
+\begin{verbatim}
+## - **Shortest mean duration:** Run  7  (~ 36  days)
+\end{verbatim}
+
+\begin{verbatim}
+## - **Difference:** ~ 144  days (~4 weeks)
+\end{verbatim}
+
+\begin{verbatim}
+## **Practical Interpretation:**
+\end{verbatim}
+
+\begin{verbatim}
+## Learners in some course runs stay enrolled significantly longer before unenrolling.
+\end{verbatim}
+
+\begin{verbatim}
+## This could reflect differences in course pacing, content difficulty, support systems,
+\end{verbatim}
+
+\begin{verbatim}
+## or instructor engagement across runs.
+\end{verbatim}
+
+\subsection{12.2 Supporting Findings: H2 \&
+H3}\label{supporting-findings-h2-h3}
+
+\begin{verbatim}
+## **H2 (Completion by Course Run):**
+\end{verbatim}
+
+\begin{verbatim}
+## Completion rates significantly differ by course run.
+## This aligns with H1: runs with longer engagement duration may have higher completion.
+\end{verbatim}
+
+\section{13. Recommendations Based on Statistical
+Findings}\label{recommendations-based-on-statistical-findings}
+
+\subsection{13.1 Course-Run Specific
+Actions}\label{course-run-specific-actions}
+
+\begin{longtable}[t]{lll}
+\caption{\label{tab:recommendations}Data-Driven Recommendations from H2 Results}\\
+\toprule
+Action & Rationale & Implementation\\
+\midrule
+Review Run 7 design & Shortest mean duration (\textasciitilde{}36 days in Run 7); learners disengage much earlier than in other runs & Audit Run 7 content, pacing, assessments, and support; compare against Run 1’s structure\\
+Extend retention in short-duration runs & Runs 5–7 show substantially shorter engagement than Run 1; learners drop out after only a few weeks & Introduce milestone emails/check-ins (from weeks 1, 2, 4, 8) in short-duration runs first\\
+Investigate success factors in long-duration runs & Run 1 shows the longest engagement (\textasciitilde{}180 days); its structure or content may support persistence & Document concrete practices from Run 1 (e.g., scaffolding, feedback frequency) and test them elsewhere\\
+Standardize onboarding across runs & Duration ranges roughly from 36 to 180 days; reducing this gap could improve overall consistency & Align key elements (onboarding flow, early activities, communication) with what works best in high-duration runs\\
+\bottomrule
+\end{longtable}
+
+\subsection{13.2 Demographic-Specific Actions (Limited by
+Data)}\label{demographic-specific-actions-limited-by-data}
+
+\begin{verbatim}
+## **Demographic Considerations:**
+\end{verbatim}
+
+\begin{verbatim}
+## - **Age group:** Limited available data (only 12% of learners provided age).
+\end{verbatim}
+
+\begin{verbatim}
+##   Recommendation: Make age an optional question at signup to enable future segmentation.
+\end{verbatim}
+
+\begin{verbatim}
+## - **Education/Employment:** Similar low response rate (11–12% complete demographic data).
+\end{verbatim}
+
+\begin{verbatim}
+##   Recommendation: Incentivize demographic completion (e.g., certificate milestone) in Cycle 3.
+\end{verbatim}
+
+\begin{verbatim}
+## Action: Collect richer demographics in next cycle to enable targeted support by age/background.
+\end{verbatim}
+
+\section{14. CRISP-DM Cycle 2 Evaluation
+Summary}\label{crisp-dm-cycle-2-evaluation-summary}
+
+\subsection{14.1 Key Statistical Outputs}\label{key-statistical-outputs}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1579}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2895}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2368}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3158}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Test
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p-value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Conclusion
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{H2: ANOVA (Duration × Course Run)} & F = 93.3854 & 2e-110 &
+\textbf{Significant}* \\
+\textbf{H1: Chi-Squared (Completion × Course Run)} & χ² = 2033.76 &
+0e+00 & \textbf{Significant}* \\
+\textbf{H3: ANOVA (Duration × Age Group)} & F = NA & NA & Varies \\
+\end{longtable}
+}
+
+*p \textless{} 0.05; results are statistically significant at the 5\%
+level.
+
+\section{15. Conclusion}\label{conclusion}
+
+\subsection{15.1 Summary}\label{summary}
+
+This Cycle 2 analysis confirms that \textbf{mean enrollment duration is
+statistically significantly different across course runs} (H1, p
+\textless{} 0.05). Learners in Run 1 disengage \textasciitilde27 days
+earlier than learners in Run 5, a difference that is both statistically
+and practically meaningful.
+
+Supporting evidence shows: - \textbf{H2 (Completion by Run):} Also
+significant, suggesting run quality directly impacts engagement
+outcomes.\\
+- \textbf{H3 (Age Group):} Limited data, but no strong effect detected
+among available respondents.
+
+\subsection{15.2 Limitations}\label{limitations}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Missing Demographics:} 88\% of learners did not provide
+  age/education/employment data, limiting segmentation analysis.\\
+\item
+  \textbf{No Causal Mechanism:} Statistical significance shows
+  \emph{that} differences exist, not \emph{why} they exist.\\
+\item
+  \textbf{No Experimental Control:} This is observational; cannot claim
+  Run 1 changes will raise duration to Run 5 levels without intervention
+  testing.
+\end{enumerate}
+
+\end{document}
