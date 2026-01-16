@@ -86,8 +86,7 @@ install.packages("renv")
 renv::restore()
 This ensures all package versions match your original analysis.
 
-Manual Setup (Fallback)
-r
+# Manual Setup (Fallback)
 ## Install required packages
 pkgs <- c("dplyr", "ggplot2", "tidyr", "knitr", "kableExtra", "readr",
           "car", "multcomp", "rmarkdown")
@@ -98,28 +97,23 @@ for (pkg in pkgs) {
   }
 }
 
-To run the project:
+# To run the project:
 1. make sure to run the munge files in order first(01_data_loading.R, 02_data_cleaning.R, 03_feature_creation)
 2. then to view the plot, run the codes in "../graphs/Plots_for_report.R"
 3. Knit the the Learning analytics Report.Rmd for the complete report
 
 # *Troubleshooting*
 "File not found: enrollment_1.csv, .."
-r
 ## Check working directory
 getwd()
-
 ## List files in data/raw/
 list.files("data/")
-
 ## Fix: Set working directory to project root
 setwd("/path/to/Project")
 
 # *"Package X not found"*
-r
 ## Restore environment
 renv::restore()
-
 ## Or install manually
 install.packages("package_name")
 --------------------------------------------------------------------------------------
