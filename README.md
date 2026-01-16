@@ -124,7 +124,10 @@ renv::restore()
 install.packages("package_name")
 
 
-Course: MAS8600 / MAS8505 – Graduate Foundations of Statistics and Data Science
-Institution: Newcastle University
-Author: Pranit Chatterjee
-Last Updated: January 15, 2026
+-Course: MAS8600 / MAS8505 – Graduate Foundations of Statistics and Data Science
+
+-Institution: Newcastle University
+
+-Author: Pranit Chatterjee
+
+- Last Updated: January 15, 2026

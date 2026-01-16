@@ -1,3 +1,9 @@
+commit a0c2282abbd65a1a9362b7431a4dbb66dd357118
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Fri Jan 16 14:23:18 2026 +0000
+
+    fixed README file
+
 commit 60bbbdf3e415cc7b49b74068b4f5f658e9efd096
 Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
 Date:   Fri Jan 16 14:10:34 2026 +0000
