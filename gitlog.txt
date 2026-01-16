@@ -1,3 +1,9 @@
+commit c24b645d95644b0128767eb268407be93ba9d9df
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Fri Jan 16 13:45:48 2026 +0000
+
+    added relevant plots in the plot directory
+
 commit aa6a7a2e84b435412c64c2010ee5036d92f5a1b9
 Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
 Date:   Thu Jan 15 18:08:37 2026 +0000
