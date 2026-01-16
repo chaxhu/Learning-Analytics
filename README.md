@@ -115,7 +115,8 @@ setwd("/path/to/Project")
 ## Restore environment
 renv::restore()
 ## Or install manually
-install.packages("package_name")
+install.packages("package name")
+
 --------------------------------------------------------------------------------------
 
 
@@ -127,4 +128,4 @@ install.packages("package_name")
 
 -Author: Pranit Chatterjee
 
-- Last Updated: January 15, 2026
+- Last Updated: January 16, 2026
