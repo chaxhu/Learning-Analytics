@@ -1,12 +1,12 @@
-This project contains one comprehensive report that encompasses two complete CRISP-DM cycles:
+# This project contains one comprehensive report that encompasses two complete CRISP-DM cycles:
 
-Cycle 1: Exploratory Data Analysis (EDA) - Understanding engagement patterns, distributions, and learner demographics
+## Cycle 1: Exploratory Data Analysis (EDA) - Understanding engagement patterns, distributions, and learner demographics
 
-Cycle 2: Hypothesis Testing & Statistical Evaluation - Rigorous statistical tests on key hypotheses
+## Cycle 2: Hypothesis Testing & Statistical Evaluation - Rigorous statistical tests on key hypotheses
 
 Key Finding: Mean enrollment duration significantly differs across 7 course runs (F = 3.4567, p < 0.001), with practical differences of ~27 days between shortest (Run 1: ~110 days) and longest (Run 5: ~137 days) courses
 
-Project structure:
+# Project structure:
 mooc-engagement-analysis/
 ├── data/                     # Raw and cleaned data files
 │   ├── enrollment_1.csv
@@ -39,7 +39,7 @@ mooc-engagement-analysis/
 
 5.Report is rendered to HTML and PDF
 
-CYCLE 1: Exploratory Data Analysis
+# CYCLE 1: Exploratory Data Analysis
 -Enrollment distribution across 7 course runs
 
 -Learner demographics summary (age, education, employment)
@@ -50,26 +50,26 @@ CYCLE 1: Exploratory Data Analysis
 
 -Key takeaways from EDA
 
-CYCLE 2: Hypothesis Testing & Evaluation
-1.H2: ANOVA - Does mean duration differ by course run?
+# CYCLE 2: Hypothesis Testing & Evaluation
+## 1.H2: ANOVA - Does mean duration differ by course run?
 
 -Assumption checks (normality, homogeneity of variance)
 
 -Main ANOVA results with interpretation
 
-2.H1: Chi-squared test - Does completion rate differ by course run?
+## 2.H1: Chi-squared test - Does completion rate differ by course run?
 
 -Contingency table analysis
 
 -Test results and interpretation
 
-3.H3: Demographics ANOVA - Does duration differ by age group?
+## 3.H3: Demographics ANOVA - Does duration differ by age group?
 
 -Limited data analysis (only 12% with age info)
 
 -Age group comparisons
 
-Data Quality Notes:
+# Data Quality Notes:
 
 -Missing Demographics: 88% of learners did not provide age/education/employment info
 
@@ -78,17 +78,17 @@ Data Quality Notes:
 -Completion: Indicated by non-NA fully_participated_at field
 
 
-Environment Setup
+# Environment Setup
 Recommended: Using renv (Reproducibility)
 r
-# One-time setup
+## One-time setup
 install.packages("renv")
 renv::restore()
 This ensures all package versions match your original analysis.
 
 Manual Setup (Fallback)
 r
-# Install required packages
+## Install required packages
 pkgs <- c("dplyr", "ggplot2", "tidyr", "knitr", "kableExtra", "readr",
           "car", "multcomp", "rmarkdown")
 
@@ -103,24 +103,24 @@ To run the project:
 2. then to view the plot, run the codes in "../graphs/Plots_for_report.R"
 3. Knit the the Learning analytics Report.Rmd for the complete report
 
-*Troubleshooting*
+# *Troubleshooting*
 "File not found: enrollment_1.csv, .."
 r
-# Check working directory
+## Check working directory
 getwd()
 
-# List files in data/raw/
+## List files in data/raw/
 list.files("data/")
 
-# Fix: Set working directory to project root
+## Fix: Set working directory to project root
 setwd("/path/to/Project")
 
-"Package X not found"
+# *"Package X not found"*
 r
-# Restore environment
+## Restore environment
 renv::restore()
 
-# Or install manually
+## Or install manually
 install.packages("package_name")
 
 
