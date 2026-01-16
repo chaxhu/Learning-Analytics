@@ -1,3 +1,21 @@
+commit aa6a7a2e84b435412c64c2010ee5036d92f5a1b9
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Thu Jan 15 18:08:37 2026 +0000
+
+    feature engineering changes in munge files
+
+commit 0253d522dc218672e1052b234c4b5a27a5a8033f
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Thu Jan 15 14:53:28 2026 +0000
+
+    fixed YAML issues in Learning analytics Report
+
+commit 139a4d4085712adf40d18b7592070adde6800257
+Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
+Date:   Wed Jan 14 17:32:57 2026 +0000
+
+    Fixed pandoca issues in the report
+
 commit 60a17ff3e2cd721584d54cc2be5a97c0936a3a8c
 Author: Pranit Chatterjee <P.Chatterjee2@newcastle.ac.uk>
 Date:   Wed Jan 14 01:32:04 2026 +0000
