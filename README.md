@@ -122,6 +122,9 @@ renv::restore()
 
 ## Or install manually
 install.packages("package_name")
+--------------------------------------------------------------------------------------
+
+
 
 
 -Course: MAS8600 / MAS8505 – Graduate Foundations of Statistics and Data Science
